@@ -9,30 +9,41 @@ logger = get_logger(__name__)
 def search_airports_cities(
     keyword: str,
     subtype: Optional[str] = None
-) -> List[dict]:
-    """
-    Search for airports and cities (autocomplete)
-    subtype can be: AIRPORT, CITY, or None for both
+) -> List[Dict[str, Any]]:
+    """Search for airports and cities using Amadeus Location API.
+
+    Args:
+        keyword: Search term to find matching airports/cities.
+        subtype: Optional filter for location type. Can be:
+            - "AIRPORT": Only search for airports
+            - "CITY": Only search for cities
+            - None: Search for both airports and cities
+
+    Returns:
+        List of location dictionaries
     """
     try:
         response = amadeus.reference_data.locations.get(
             keyword=keyword,
             subType=subtype or Location.ANY
         )
-        locations = response.data
-        return locations
+        return response.data
     except ResponseError as error:
         handle_amadeus_error(error)
         return []
 
-def get_flight_destinations(origin: str) -> List[dict]:
-    """
-    Get flight destinations from an origin
+def get_flight_destinations(origin: str) -> List[Dict[str, Any]]:
+    """Get all direct flight destinations from a given origin airport.
+
+    Args:
+        origin: IATA code of the origin airport (e.g., "BOM" for Mumbai)
+
+    Returns:
+        List of destination dictionaries
     """
     try:
         response = amadeus.airport.direct_destinations.get(departureAirportCode=origin)
-        destinations = response.data
-        return destinations
+        return response.data
     except ResponseError as error:
         handle_amadeus_error(error)
         return []
@@ -42,17 +53,25 @@ def search_flights(
     destination: str,
     departure_date: datetime,
     adults: int,
-    currency_code: Optional[str] = "INR",
-    max_results: Optional[int] = 20
-) -> List[dict]:
-    """
-    Search for flights using the Amadeus Flight Offers Search API
+    currency_code: str = "INR",
+    max_results: int = 20
+) -> List[Dict[str, Any]]:
+    """Search for available flights using the Amadeus Flight Offers Search API.
+
+    Args:
+        origin: IATA code of the departure airport
+        destination: IATA code of the arrival airport
+        departure_date: Date of departure
+        adults: Number of adult passengers (1-9)
+        currency_code: Currency for pricing (default: "INR")
+        max_results: Maximum number of results to return (default: 20)
+
+    Returns:
+        List of flight offer dictionaries
     """
     try:
-        # Format dates as YYYY-MM-DD
         departure_date_str = departure_date.strftime("%Y-%m-%d")
 
-        # Prepare the search parameters
         search_params = {
             "originLocationCode": origin,
             "destinationLocationCode": destination,
@@ -63,24 +82,24 @@ def search_flights(
         }
 
         response = amadeus.shopping.flight_offers_search.get(**search_params)
-
-        flights = response.data
-        return flights
+        return response.data
 
     except ResponseError as error:
         handle_amadeus_error(error)
         return []
 
-def get_flight_offer_price(
-    flight_offer: Dict[str, Any]
-) -> Dict[str, Any]:
-    """
-    Get the price of a flight offer
+def get_flight_offer_price(flight_offer: Dict[str, Any]) -> Dict[str, Any]:
+    """Get the final price for a flight offer including taxes and fees.
+
+    Args:
+        flight_offer: A flight offer object returned from search_flights
+
+    Returns:
+        Dictionary containing pricing details
     """
     try:
         response = amadeus.shopping.flight_offers.pricing.post(flight_offer)
-        flight_offer_price = response.data
-        return flight_offer_price
+        return response.data
     except ResponseError as error:
         handle_amadeus_error(error)
         return {}
@@ -89,70 +108,49 @@ def create_flight_booking(
     flight_offer: Dict[str, Any],
     travelers: List[Dict[str, Any]]
 ) -> Dict[str, Any]:
-    """
-    Create a flight booking using the Flight Create Orders API
+    """Create a flight booking using the Flight Create Orders API.
 
-    Travelers format:
-    [{
-      "id": "1",
-      "dateOfBirth": "1982-01-16",
-      "name": {
-        "firstName": "JORGE",
-        "lastName": "GONZALES"
-      },
-      "gender": "MALE",
-      "contact": {
-        "emailAddress": "jorge.gonzales833@telefonica.es",
-        "phones": [
-          {
-            "deviceType": "MOBILE",
-            "countryCallingCode": "34",
-            "number": "480080076"
-          }
-        ]
-      },
-      "documents": [
-        {
-          "documentType": "PASSPORT",
-          "birthPlace": "Madrid",
-          "issuanceLocation": "Madrid",
-          "issuanceDate": "2015-04-14",
-          "number": "00000000",
-          "expiryDate": "2025-04-14",
-          "issuanceCountry": "ES",
-          "validityCountry": "ES",
-          "nationality": "ES",
-          "holder": true
-        }
-      ]
-    }]
+    Args:
+        flight_offer: A flight offer object returned from search_flights
+        travelers: List of traveler details.
+
+    Returns:
+        Dictionary containing booking details
     """
     try:
         response = amadeus.booking.flight_orders.post(
             flight_offer,
             travelers=travelers
         )
-        booking = response.data
-        return booking
+        return response.data
     except ResponseError as error:
         handle_amadeus_error(error)
         return {}
 
 def get_booking_details(booking_id: str) -> Dict[str, Any]:
-    """
-    Retrieve booking details using the Flight Order Management API
+    """Retrieve booking details using the Flight Order Management API.
+
+    Args:
+        booking_id: The unique identifier of the booking
+
+    Returns:
+        Dictionary containing booking details
     """
     try:
         response = amadeus.booking.flight_order(booking_id).get()
-        booking = response.data
-        return booking
+        return response.data
     except ResponseError as error:
         handle_amadeus_error(error)
         return {}
 
 def cancel_booking(booking_id: str) -> bool:
-    """
-    Cancel a flight booking
+    """Cancel a flight booking.
+
+    Args:
+        booking_id: The unique identifier of the booking to cancel
+
+    Returns:
+        True if the booking was successfully cancelled, False otherwise
     """
     try:
         amadeus.booking.flight_order(booking_id).delete()
