@@ -1,9 +1,9 @@
 # Flight Booking API Documentation
 
 ## Server Information
-- Base URL: `https://0bf0-202-140-45-108.ngrok-free.app`
-- Interactive API Documentation (Swagger UI): `https://0bf0-202-140-45-108.ngrok-free.app/docs`
-- OpenAPI Specification: `https://0bf0-202-140-45-108.ngrok-free.app/openapi.json`
+- Base URL: `https://flight-agent.onrender.com`
+- Interactive API Documentation (Swagger UI): `https://flight-agent.onrender.com/docs`
+- OpenAPI Specification: `https://flight-agent.onrender.com/openapi.json`
 
 ## Overview
 This API provides endpoints for managing flight bookings, including searching for airports and flights, getting flight prices, creating bookings, and managing existing bookings.
@@ -993,8 +993,8 @@ true
 7. Flight offer objects received from the search endpoint should be used as-is when creating bookings
 
 ## Additional Resources
-- Interactive API Documentation: Visit the [Swagger UI](https://0bf0-202-140-45-108.ngrok-free.app/docs) for interactive API testing
-- OpenAPI Specification: Download the [OpenAPI JSON](https://0bf0-202-140-45-108.ngrok-free.app/openapi.json) for automated tooling
+- Interactive API Documentation: Visit the [Swagger UI](https://flight-agent.onrender.com/docs) for interactive API testing
+- OpenAPI Specification: Download the [OpenAPI JSON](https://flight-agent.onrender.com/openapi.json) for automated tooling
 
 ## Notes
 - The API is currently running on an ngrok tunnel, which means the URL may change in the future
