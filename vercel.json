@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "requirements.txt",
+      "use": "@vercel/python",
+      "config": {
+        "pip": "uv pip",
+        "installCommand": "uv pip sync requirements.txt"
+      }
+    },
+    {
+      "src": "mcp_server.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [{ "src": "/(.*)", "dest": "mcp_server:mcp" }]
+}
