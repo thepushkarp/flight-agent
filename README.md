@@ -35,17 +35,17 @@ uvicorn app.main:app --reload
 
 The server will start at http://localhost:8000
 
-## MCP Server (Alternative Interface)
+## MCP Server
 
-This project also includes a Model Context Protocol (MCP) server, allowing interaction with the flight services through MCP-compatible clients (like LLMs).
+This project also includes a Model Context Protocol (MCP) server, allowing interaction with the flight services through MCP clients.
 
 1. Ensure Amadeus credentials are set as environment variables (see Setup step 4).
-2. Run the MCP development server:
+2. Run the MCP server via sse:
 ```bash
-mcp dev app/mcp_server.py
+python app/mcp_server.py
 ```
 
-This will start the MCP server and provide an interface (like the MCP Inspector) for testing the available tools.
+This will start the MCP server. You can then use the MCP client to interact with the server via sse.
 
 ## API Endpoints
 
